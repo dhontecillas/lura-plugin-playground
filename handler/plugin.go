@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"crypto/sha256"
+	"encoding/base64"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -46,21 +47,22 @@ func (r registerer) registerHandlers(ctx context.Context, extra map[string]inter
 			body = rec.Body.Bytes()
 		}
 		sum := sha256.Sum256(body)
-		curETag := string(sum[:])
+		curETag := base64.StdEncoding.EncodeToString(sum[:])
 
 		// There can be "weak" eTag (only taking into
 		// account the boyd), or "strong" eTag taking
 		// into account the headers: for this test we
 		// only use the weak one:
-		copyHeaders(resp.Header, w.Header())
-		r.Header.Set("ETag", string(curETag))
+		wHeaders := w.Header()
+		copyHeaders(resp.Header, wHeaders)
+		wHeaders.Set("ETag", string(curETag))
 		if knownEtag == curETag {
-			// not sure if we should spit only this header..
+			// n.ot sure if we should spit only this header..
 			w.WriteHeader(http.StatusNotModified)
 			return
 		}
-		w.Write(body)
 		w.WriteHeader(resp.StatusCode)
+		w.Write(body)
 	}), nil
 }
 
