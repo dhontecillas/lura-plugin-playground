@@ -2,7 +2,10 @@ module github.com/dhontecillas/lura-plugin-playground
 
 go 1.20
 
-require github.com/gin-gonic/gin v1.8.2
+require (
+	github.com/gin-gonic/gin v1.8.2
+	github.com/google/martian v2.1.1-0.20190517191504-25dcb96d9e51+incompatible
+)
 
 require (
 	github.com/gin-contrib/sse v0.1.0 // indirect
