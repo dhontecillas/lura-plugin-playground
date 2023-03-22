@@ -27,3 +27,16 @@ alpine_handler:
 	cp etaghandler.so ../../opensource/playground-community/config/krakend/priv_hnt/etaghandler.so
 .PHONY: alpine_handler
 
+client: 
+	mkdir -p plugins
+	# go build -buildmode=plugin -o plugins/casemodifier.so ./response_modifier
+	go build -buildmode=plugin -o ../../opensource/playground-community/config/krakend/priv_hnt/censor.so ./client
+.PHONY: client
+
+alpine_client:
+	docker run -it -v "$$PWD:/app" \
+		-w /app \
+		krakend/builder:2.2.1 \
+		go build -buildmode=plugin -o censor.so ./client
+	cp censor.so ../../opensource/playground-community/config/krakend/priv_hnt/censor.so
+.PHONY: alpine_handler
